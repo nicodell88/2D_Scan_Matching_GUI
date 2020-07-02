@@ -1,4 +1,4 @@
-#2D Scan Matching GUI
+# 2D Scan Matching GUI
 
 This is a program written in C# / .NET which performs scan-alignment to align a sequence of scans obtained from a laser range finder.Scan-alignment is a common framework for correct the pose of a mobile robot in an optimisation framework, it is also often used in generating proposal distributions for sequential monte-carlo (SMC) based simultaneous localisation and mapping (SLAM) solutions. 
 
