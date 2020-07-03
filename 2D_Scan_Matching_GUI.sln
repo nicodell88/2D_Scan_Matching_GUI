@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2D_Scan_Matching_GUI", "2D_Scan_Matching_GUI\2D_Scan_Matching_GUI.csproj", "{4E5C1DE6-E267-4945-86D7-F969424FA2FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scan_Matching_GUI.test", "Scan_Matching_GUI.test\Scan_Matching_GUI.test.csproj", "{E54173B2-94FA-4DF8-9E7E-CDE26A480B5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|anycpu = Debug|anycpu
@@ -13,5 +15,9 @@ Global
 		{4E5C1DE6-E267-4945-86D7-F969424FA2FC}.Debug|anycpu.Build.0 = Debug|anycpu
 		{4E5C1DE6-E267-4945-86D7-F969424FA2FC}.Release|anycpu.ActiveCfg = Release|anycpu
 		{4E5C1DE6-E267-4945-86D7-F969424FA2FC}.Release|anycpu.Build.0 = Release|anycpu
+		{E54173B2-94FA-4DF8-9E7E-CDE26A480B5A}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{E54173B2-94FA-4DF8-9E7E-CDE26A480B5A}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{E54173B2-94FA-4DF8-9E7E-CDE26A480B5A}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{E54173B2-94FA-4DF8-9E7E-CDE26A480B5A}.Release|anycpu.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
