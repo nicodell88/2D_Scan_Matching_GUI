@@ -29,12 +29,9 @@ namespace D_Scan_Matching_GUI
 
     public static class ScanMatching
     {
-
-        private static Matrix<double> _rPNn = Matrix<double>.Build.Dense(2, 1);
-        private static Matrix<double> _rEBb = Matrix<double>.Build.Dense(2, 1);
         private static readonly double Sigma = 1;
 
-        public static (double, Vector<double>, Matrix<double>) Cost(Vector<double> v)
+        public static Tuple< double, Vector<double>, Matrix<double> > Cost(Vector<double> v)
         //public static Vector<double> cost()
         {
             //var f = new Func<Vector<double>, double>(v => Math.Pow(v[0], 2) + Math.Pow(v[1], 4) + Math.Pow(v[2], 6));              // define function
@@ -52,49 +49,54 @@ namespace D_Scan_Matching_GUI
             var g = G.Dense(3);
             var h = H.Dense(3, 3);
 
+            
 
             //var rENn = Matrix<double>.Build.Dense(2,1);
 
             var rBNn = v.SubVector(0, 2);
-            var rEBn = SO2.EulerRotation(v.At(2)).Multiply(_rEBb);
+            var rEBn = SO2.EulerRotation(v.At(2)).Multiply(rEBb);
+            var dRnb = SO2.Derivative(v.At(2));
             var rENn = Matrix<double>.Build.Dense(2, rEBn.ColumnCount);
             for (int i = 0; i < rENn.ColumnCount; i++)
             {
                 rENn.SetColumn(i, rBNn.Add(rEBn.Column(i)));
             }
 
-            //Get point cloud data.
-            for (int i = 0; i < _rEBb.ColumnCount; i++)
-            {
-                for (int j = 0; j < _rPNn.ColumnCount; j++)
-                {
-                    var e = rENn.Column(i).Subtract(_rPNn.Column(j));
+            double[] Je_tmp = { 1, 0, 0, 1, 0, 0 };
+            var Je = Matrix<double>.Build.DenseOfColumnMajor(2, 3, Je_tmp);
 
-                    f += 1.0 / Math.Sqrt(2 * Math.PI * Sigma * Sigma) * Math.Exp(-1.0 / (2 * Sigma * Sigma) * e.DotProduct(e));
+            //Get point cloud data.
+            for (int i = 0; i < rEBb.ColumnCount; i++)
+            {
+                for (int j = 0; j < rPNn.ColumnCount; j++)
+                {
+                    //Calculate error
+                    var e = rENn.Column(i).Subtract(rPNn.Column(j));
+                    //Calculate residual
+                    double r = Math.Exp(-0.25 / (Sigma * Sigma) * e.DotProduct(e));
+
+                    //Calculate Jacobian of the exponent
+                    Je.SetColumn(2, dRnb.Multiply(rEBb.Column(i)));
+                    //Calculate Jacobian of the residual
+                    var J = Je.TransposeThisAndMultiply(e).Multiply(-0.5 / (Sigma * Sigma) * r);
+
+                    //Calculate cost
+                    f -= r * r;
+                    //Calculate the exact gradient and appproximate hessian
+                    g = g.Subtract(J.Multiply(r)); // J'*r
+                    h = h.Subtract(J.OuterProduct(J)); //J'*J (Gauss-Newton approximation)
                 }
             }
 
-
-
-
-
-            return (-f, g, h);
+            return Tuple.Create(0.5 * f, g, h);
         }
 
 
 
 
-        public static Matrix<double> rPNn
-        {
-            get { return _rPNn; }
-            set { _rPNn = value; }
-        }
+        public static Matrix<double> rPNn { get; set; } = Matrix<double>.Build.Dense(2, 1);
 
-        public static Matrix<double> rEBb
-        {
-            get { return _rEBb; }
-            set { _rEBb = value; }
-        }
+        public static Matrix<double> rEBb { get; set; } = Matrix<double>.Build.Dense(2, 1);
 
 
 
