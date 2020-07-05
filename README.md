@@ -11,7 +11,7 @@ TODO: how GUI works
 TODO: data format
 
 
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+![alt text](https://github.com/nicodell88/2D_Scan_Matching_GUI/blob/master/Example.png?raw=true "Logo Title Text 1")
 
 
 
