@@ -29,6 +29,17 @@ public partial class MainWindow : Gtk.Window
 
         //myModel.Series.Add(scat);
         //plotView.Model = myModel;
+
+
+
+        //Choose file
+
+
+
+        // Run scan Matching
+        ScanMatching.RunScanMatch("../../../LaserDataSimulated.txt");
+
+        // Run Plot
         var plotView = new PlotView();
         this.Add(plotView);
         plotView.ShowAll();
@@ -37,24 +48,18 @@ public partial class MainWindow : Gtk.Window
         var model = new PlotModel { Title = "ScatterSeries" };
         var scatterSeries = new ScatterSeries { MarkerType = MarkerType.Circle };
         var r = new Random(314);
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < D_Scan_Matching_GUI.ScanMatching.rPNn.ColumnCount; i++)
         {
-            var x = r.NextDouble();
-            var y = r.NextDouble();
-            var size = r.Next(5, 15);
-            var colorValue = r.Next(100, 1000);
+            var x = D_Scan_Matching_GUI.ScanMatching.rPNn[0,i];
+            var y = D_Scan_Matching_GUI.ScanMatching.rPNn[1, i];
+            var size = 5;
+            var colorValue = 1500;
             scatterSeries.Points.Add(new ScatterPoint(x, y, size, colorValue));
         }
 
         model.Series.Add(scatterSeries);
         model.Axes.Add(new LinearColorAxis { Position = AxisPosition.Right, Palette = OxyPalettes.Jet(200) });
         plotView.Model = model;
-        //Choose file
-
-
-
-        // Run scan Matching
-        //ScanMatching.RunScanMatch("../../../LaserDataSimulated.txt");
 
 
     }

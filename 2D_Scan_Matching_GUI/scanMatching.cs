@@ -90,7 +90,7 @@ namespace D_Scan_Matching_GUI
                 }
             }
             //h = Matrix<double>.Build.DenseIdentity(3);
-            return Tuple.Create(0.5 * f, g, h);
+            return Tuple.Create(0.5 * f / rPNn.ColumnCount , g.Divide((double)rPNn.ColumnCount), h.Divide((double)rPNn.ColumnCount));
         }
 
 
@@ -236,7 +236,8 @@ namespace D_Scan_Matching_GUI
 
             rPNn = rPNn_new;
             //Loop through data, setting up and running optimisation routine each time.
-            for (int i = 1; i < Range.Count(); i++)
+            //for (int i = 1; i < Range.Count(); i++)
+            for (int i = 1; i < 10; i++)
             {
                 //Initialise independent point cloud, expressed in body coordinates.rPBb
                 rEBb = GetPointCloudFromRange(Range[i]);
@@ -250,8 +251,8 @@ namespace D_Scan_Matching_GUI
                 rBNn[1] = Xopt[1];
                 Rnb = SO2.EulerRotation(Xopt[2]);
                 //Append to PointCloud
-                
 
+                rPNn_new = Matrix<double>.Build.DenseOfMatrix(rEBb);
                 for (int j = 0; j < rPNn_new.ColumnCount; j++)
                 {
                     rPNn_new.SetColumn(j, rBNn.Add(Rnb.Multiply(rEBb.Column(j))));
