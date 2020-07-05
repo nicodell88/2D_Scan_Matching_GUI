@@ -8,12 +8,10 @@ namespace D_Scan_Matching_GUI
     {
         public static void Main(string[] args)
         {
-            ScanMatching.Init("../../../TestData.txt");
-
-            //Application.Init();
-            //MainWindow win = new MainWindow();
-            //win.Show();
-            //Application.Run();
+            Application.Init();
+            MainWindow win = new MainWindow();
+            win.Show();
+            Application.Run();
         }
     }
 }

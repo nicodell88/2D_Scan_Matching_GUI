@@ -6,7 +6,6 @@
   <import>
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../../packages/OxyPlot.GtkSharp.1.0.0/lib/net45/OxyPlot.GtkSharp.dll" />
-    <widget-library name="../../packages/OxyPlot.GtkSharp3.1.0.0/lib/net45/OxyPlot.GtkSharp3.dll" />
     <widget-library name="../bin/Debug/2D_Scan_Matching_GUI.exe" internal="true" />
   </import>
   <widget class="Gtk.Window" id="MainWindow" design-size="400 300">

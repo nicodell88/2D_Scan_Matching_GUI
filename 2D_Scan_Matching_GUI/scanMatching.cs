@@ -30,7 +30,7 @@ namespace D_Scan_Matching_GUI
 
     public static class ScanMatching
     {
-        private static readonly double Sigma = 0.05;
+        private static readonly double Sigma = 0.15;
 
         public static Tuple<double, Vector<double>, Matrix<double>> Cost(Vector<double> v)
         //public static Vector<double> cost()
@@ -69,6 +69,7 @@ namespace D_Scan_Matching_GUI
             //Get point cloud data.
             for (int i = 0; i < rEBb.ColumnCount; i++)
             {
+                //TODO: inner forloop can be vectorised.
                 for (int j = 0; j < rPNn.ColumnCount; j++)
                 {
                     //Calculate error
@@ -84,8 +85,8 @@ namespace D_Scan_Matching_GUI
                     //Calculate cost
                     f -= r * r;
                     //Calculate the exact gradient and appproximate hessian
-                    g = g.Subtract(J.Multiply(r)); // J'*r
-                    h = h.Subtract(J.OuterProduct(J)); //J'*J (Gauss-Newton approximation)
+                    g.Subtract(J.Multiply(r),g); // J'*r
+                    h.Subtract(J.OuterProduct(J),h); //J'*J (Gauss-Newton approximation)
                 }
             }
             //h = Matrix<double>.Build.DenseIdentity(3);
@@ -104,6 +105,8 @@ namespace D_Scan_Matching_GUI
         public static Matrix<double> rQBb { get; set; } //a matrix, where each column holds the unit vector directions of each lidar beam in body coordinates
 
         public static double MaxRange { get; set; } = 60;//metres
+
+        public static List<double[]> Pose { get; set; } = new List<double[]>();
 
         public static void Init(String inpF)
         {
@@ -156,7 +159,14 @@ namespace D_Scan_Matching_GUI
                         //Console.WriteLine(MaxRange);
                         break;
                     case "ODOM":
-                        //I might start by not using the odometry for initial condition?
+
+                        double[] tmp =  {double.Parse(line[1]),
+                        double.Parse(line[2]),
+                        double.Parse(line[3])};
+
+                        Pose.Add(tmp);
+
+
                         break;
                     case "Lidar":
                         List<double> _ranges = new List<double>();
@@ -170,7 +180,19 @@ namespace D_Scan_Matching_GUI
                         break;
                 }
 
-            }
+            }//endfor
+             //Data has been parsed
+
+            //Initialise Scan matching
+
+
+
+
+
+
+            //Console.WriteLine(GetPointCloudFromRange(Range[0]).ToString());
+
+
             //foreach (var ranges_ in Range)
             //{
             //    foreach (var range in ranges_)
@@ -183,12 +205,59 @@ namespace D_Scan_Matching_GUI
             //List<Matrix<double>> Foobar= new List<Matrix<double>>();
 
             //Parse data
-
-            //Initialise reference point cloud, expressed in map coordinates. rPNn
-
-            //Initialise independent point cloud, expressed in body coordinates.rPBb
-
             //
+
+        }
+
+        public static void RunScanMatch(String inpF)
+        {
+            //Call Init
+            Init(inpF);
+            //Initialise Optimisation routine
+            var obj = ObjectiveFunction.GradientHessian(Cost);
+            var solver = new ConjugateGradientMinimizer(2e1, 30); //(1e-5, 100, false);
+
+            Vector<double> x_init = Vector<double>.Build.DenseOfArray(new double[] { 0.0,0.0,0.0 });
+            Vector<double> Xopt = Vector<double>.Build.DenseOfArray(new double[] { 0.0, 0.0, 0.0 });
+            //Initialise reference point cloud, expressed in map coordinates. rPNn
+            //var tmp = GetPointCloudFromRange(Range[0]);
+
+            var rBNn = Vector<double>.Build.Dense(2);
+            rBNn[0] = Pose[0][0];
+            rBNn[1] = Pose[0][1];
+            var Rnb = SO2.EulerRotation(Pose[0][2]);
+            rEBb = GetPointCloudFromRange(Range[0]);
+            var rPNn_new = Matrix<double>.Build.DenseOfMatrix(rEBb);
+
+            for (int j = 0; j < rPNn_new.ColumnCount; j++)
+            {
+                rPNn_new.SetColumn(j, rBNn.Add(Rnb.Multiply(rEBb.Column(j))));
+            }
+
+            rPNn = rPNn_new;
+            //Loop through data, setting up and running optimisation routine each time.
+            for (int i = 1; i < Range.Count(); i++)
+            {
+                //Initialise independent point cloud, expressed in body coordinates.rPBb
+                rEBb = GetPointCloudFromRange(Range[i]);
+                //Set up initial conditions
+                //x_init = ; //reuse last optimum as inital conditions
+                x_init.SetValues(Pose[i]);
+                 var result = solver.FindMinimum(obj, x_init);
+                Xopt = result.MinimizingPoint;
+                rBNn = Vector<double>.Build.Dense(2);
+                rBNn[0] = Xopt[0];
+                rBNn[1] = Xopt[1];
+                Rnb = SO2.EulerRotation(Xopt[2]);
+                //Append to PointCloud
+                
+
+                for (int j = 0; j < rPNn_new.ColumnCount; j++)
+                {
+                    rPNn_new.SetColumn(j, rBNn.Add(Rnb.Multiply(rEBb.Column(j))));
+                }
+                rPNn = rPNn.Append(rPNn_new);
+            }
 
         }
 
@@ -210,12 +279,13 @@ namespace D_Scan_Matching_GUI
 
 
             double[] tmp = new double[idx.Count() * 2];
-            for (int i = 0; i < inp.Count(); i++)
+            for (int i = 0; i < idx.Count(); i++)
             {
                 tmp[0 + 2 * i] = rQBb[0, idx[i]] * inp[idx[i]];
+                tmp[1 + 2 * i] = rQBb[1, idx[i]] * inp[idx[i]];
             }
 
-            
+            return Matrix<double>.Build.DenseOfColumnMajor(2, idx.Count(), tmp);
         }
 
 

@@ -68,9 +68,6 @@
     <Reference Include="OxyPlot.GtkSharp">
       <HintPath>..\packages\OxyPlot.GtkSharp.1.0.0\lib\net45\OxyPlot.GtkSharp.dll</HintPath>
     </Reference>
-    <Reference Include="OxyPlot.GtkSharp3">
-      <HintPath>..\packages\OxyPlot.GtkSharp3.1.0.0\lib\net45\OxyPlot.GtkSharp3.dll</HintPath>
-    </Reference>
     <Reference Include="MathNet.Numerics">
       <HintPath>..\packages\MathNet.Numerics.4.11.0\lib\net461\MathNet.Numerics.dll</HintPath>
     </Reference>
