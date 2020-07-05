@@ -30,7 +30,7 @@ namespace D_Scan_Matching_GUI
 
     public static class ScanMatching
     {
-        private static readonly double Sigma = 0.15;
+        private static readonly double Sigma = 0.1;
 
         public static Tuple<double, Vector<double>, Matrix<double>> Cost(Vector<double> v)
         //public static Vector<double> cost()
@@ -44,11 +44,11 @@ namespace D_Scan_Matching_GUI
             //IObjectiveFunction GradientHessian(Func<Vector<double>, double> function, Func<Vector<double>, Vector<double>> gradient, Func<Vector<double>, Matrix<double>> hessian)
 
             double f = 0;
-            var G = Vector<double>.Build;
-            var H = Matrix<double>.Build;
+            var NewVec = Vector<double>.Build;
+            var NewMat = Matrix<double>.Build;
 
-            var g = G.Dense(3);
-            var h = H.Dense(3, 3);
+            var g = NewVec.Dense(3);
+            var h = NewMat.Dense(3, 3);
 
 
 
@@ -57,14 +57,14 @@ namespace D_Scan_Matching_GUI
             var rBNn = v.SubVector(0, 2);
             var rEBn = SO2.EulerRotation(v.At(2)).Multiply(rEBb);
             var dRnb = SO2.Derivative(v.At(2));
-            var rENn = Matrix<double>.Build.Dense(2, rEBn.ColumnCount);
+            var rENn = NewMat.Dense(2, rEBn.ColumnCount);
             for (int i = 0; i < rENn.ColumnCount; i++)
             {
                 rENn.SetColumn(i, rBNn.Add(rEBn.Column(i)));
             }
 
             double[] Je_tmp = { 1, 0, 0, 1, 0, 0 };
-            var Je = Matrix<double>.Build.DenseOfColumnMajor(2, 3, Je_tmp);
+            var Je = NewMat.DenseOfColumnMajor(2, 3, Je_tmp);
 
             //Get point cloud data.
             for (int i = 0; i < rEBb.ColumnCount; i++)
@@ -215,7 +215,7 @@ namespace D_Scan_Matching_GUI
             Init(inpF);
             //Initialise Optimisation routine
             var obj = ObjectiveFunction.GradientHessian(Cost);
-            var solver = new ConjugateGradientMinimizer(2e1, 30); //(1e-5, 100, false);
+            var solver = new ConjugateGradientMinimizer(1e0, 30); //(1e-5, 100, false);
 
             Vector<double> x_init = Vector<double>.Build.DenseOfArray(new double[] { 0.0,0.0,0.0 });
             Vector<double> Xopt = Vector<double>.Build.DenseOfArray(new double[] { 0.0, 0.0, 0.0 });
@@ -236,8 +236,8 @@ namespace D_Scan_Matching_GUI
 
             rPNn = rPNn_new;
             //Loop through data, setting up and running optimisation routine each time.
-            //for (int i = 1; i < Range.Count(); i++)
-            for (int i = 1; i < 10; i++)
+            for (int i = 1; i < Range.Count(); i++)
+            //for (int i = 1; i < 40; i++)
             {
                 //Initialise independent point cloud, expressed in body coordinates.rPBb
                 rEBb = GetPointCloudFromRange(Range[i]);
