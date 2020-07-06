@@ -1,16 +1,16 @@
 # 2D Scan Matching GUI
 
-This is a program written in C# / .NET which performs scan-alignment to align a sequence of scans obtained from a laser range finder.Scan-alignment is a common framework for correct the pose of a mobile robot in an optimisation framework, it is also often used in generating proposal distributions for sequential monte-carlo (SMC) based simultaneous localisation and mapping (SLAM) solutions. 
+This is a program written in C# / .NET which performs scan-alignment to align a sequence of scans obtained from a laser range finder. Scan-alignment is a common framework for correct the pose of a mobile robot in an optimisation framework, it is also often used in generating proposal distributions for sequential monte-carlo (SMC) based simultaneous localisation and mapping (SLAM) solutions. 
 
 The scan alignment technique implemented here is similar to [[1]](#1). The same technique is also implemented in https://github.com/nicodell88/Bragg-Edge-Fitting for obtaining the unknown pose-offsets of a poly-crystaline sample within an energy resolved neutron beam.
 
 ## Optimisation Routine
 
-Many scan matching techniques require greedy data association. This approach compares all points in the point cloud to one-another. This solution is very similar to the method presented in [[1]](#1). The cost function used is
+Many scan matching techniques require greedy data association, however this approach compares all points in the point cloud to one-another. This solution is very similar to the method presented in [[1]](#1). The cost function used is
 
 <img src="https://render.githubusercontent.com/render/math?math=f(\theta)=\sum_{i} \sum_{j} \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \left(\frac{-1}{2 \sigma^{2}}\left\|\left[\begin{array}{l}x_{i}(\theta) \\ y_{i}(\theta)\end{array}\right]-\left[\begin{array}{l}x_{j} \\ y_{j}\end{array}\right]\right\|^{2}\right).">
 
-By halving the exponent the resulting cost function can be made to look like a least squares cost function and  quasi newton approximations (see Chapter 8 of [[2]](#2)) can be used to speed up convergence. The optimal robot pose is given by
+By halving the exponent, the resulting cost function can be made to look like a least squares cost function and Gauss-Newton approximations (see Chapter 10 of [[2]](#2)) can be used to speed up convergence. The optimal robot pose is given by
 
 <img src="https://render.githubusercontent.com/render/math?math=\theta^{\star}=\arg \max _{\theta} f(\theta)">
 
